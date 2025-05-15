@@ -1,9 +1,9 @@
-
 'use client';
-
+import Link from 'next/link';
 import { useState } from 'react';
 import { searchMovies } from '@/lib/tmdb';
 import Image from 'next/image';
+
 export default function Home() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<{id: number, poster_path: string, title: string, vote_average: number}[]>([]);
@@ -16,7 +16,6 @@ export default function Home() {
     setLoading(true);
     try {
       const res = await searchMovies(encodeURIComponent(query));
-      console.log(res);
       setResults(res || []);
     } catch (err) {
       console.error('Error fetching movies:', err);
@@ -46,15 +45,18 @@ export default function Home() {
       </form>
 
       {loading && <p>Loading...</p>}
-
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {results.map((movie) => (
-          <div key={movie.id} className="bg-white rounded shadow p-2">
+          <Link 
+            href={`/movie/${movie.id}`} 
+            key={movie.id}
+            className="bg-white rounded shadow p-2 hover:shadow-lg transition-shadow"
+          >
             {movie.poster_path ? (
               <img
                 src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
                 alt={movie.title}
-                className="rounded mb-2"
+                className="rounded mb-2 w-full"
               />
             ) : (
               <div className="h-[450px] bg-gray-200 mb-2 rounded flex items-center justify-center">
@@ -63,7 +65,7 @@ export default function Home() {
             )}
             <h2 className="text-sm font-semibold">{movie.title}</h2>
             <p className="text-xs text-gray-600">⭐ {movie.vote_average}</p>
-          </div>
+          </Link>
         ))}
       </div>
     </main>
